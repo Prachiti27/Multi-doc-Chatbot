@@ -4,8 +4,13 @@ import uuid
 from backend.app.ingest import extract_text, UPLOAD_DIR
 from backend.app.chunker import chunk_text
 from backend.app.vectorize import store_chunks
+from pydantic import BaseModel
+from backend.app.rag import generate_answer
 
 app = FastAPI(title="Multi-Document Chat App")
+
+class ChatRequest(BaseModel):
+    question: str
 
 @app.post("/upload")
 async def upload_documents(files: list[UploadFile] = File(...)):
@@ -34,6 +39,11 @@ async def upload_documents(files: list[UploadFile] = File(...)):
             "documents": len(files),
             "total_chunks": len(all_chunks)
         }
+        
+@app.post("/chat")
+def chat(req: ChatRequest):
+    answer = generate_answer(req.question)
+    return {"answer": answer}
 
 @app.get("/health")
 def health():
