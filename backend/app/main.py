@@ -3,6 +3,7 @@ from pathlib import Path
 import uuid
 from backend.app.ingest import extract_text, UPLOAD_DIR
 from backend.app.chunker import chunk_text
+from backend.app.vectorize import store_chunks
 
 app = FastAPI(title="Multi-Document Chat App")
 
@@ -26,10 +27,12 @@ async def upload_documents(files: list[UploadFile] = File(...)):
         
         all_chunks.extend(chunks)
         
+        store_chunks(all_chunks)
+        
         return {
-            "message": "Documents processed",
-            "total_chunks": len(all_chunks),
-            "sample_chunk": all_chunks[0] if all_chunks else None
+            "message": "Docs embedded and stored",
+            "documents": len(files),
+            "total_chunks": len(all_chunks)
         }
 
 @app.get("/health")

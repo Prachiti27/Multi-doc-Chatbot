@@ -11,3 +11,4 @@ python-docx
 tiktoken
 python-multipart
 langchain-text-splitters
+langchain-core
